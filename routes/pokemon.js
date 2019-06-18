@@ -1,9 +1,9 @@
 const express =  require('express')
 const router = express.Router()
 
-// require schema
-const Pokemon = require('../models/Pokemon')
-const { index, show } = require('../controller/pokemon')
+
+const { index, show, createPoke, updatePoke, findAndUpdatePoke, deletePoke } = require('../controller/pokemonController')
+
 // getting all pokemon
 router.get('/pokemon', index)
 
@@ -11,61 +11,15 @@ router.get('/pokemon', index)
 router.get('/pokemon/:id', show)
 
 // post
-router.post('/pokemon', (req, res) => {
-  const { id, name, height, moves, image}  = req.body
-  // console.log(id, name, height, moves, image)
-  Pokemon.create({
-    id: id,
-    name: name,
-    height: height,
-    moves: moves,
-    image: image
-  })
-  .then( newPoke => {
-    return res.json(newPoke)
-  })
-  .catch( err => {
-    return res.json(err)
-  })
-})
+router.post('/pokemon', createPoke)
 
 // update
-router.put('/pokemon/:id', (req, res) => {
-  const { id } = req.params
-  const { newName } = req.body
-  Pokemon.findOne({id})
-  .then( poke => {
-    console.log(poke)
-    poke.name = newName
-    poke.save()
-    .then( doc => res.send(`${doc.name} has been updated`))
-    .catch( error => console.log(error) )
-  })
-  .catch( err => res.json(err))
-})
+router.put('/pokemon/:id', updatePoke)
 
-// // update using findOneAndUpdate
-// router.put('/pokemon/:id', (req, res) => {
-//   const { id } = req.params
-//   const { newName } = req.body
-//   Pokemon.findOneAndUpdate({id}, {name: newName})
-//   .then( poke => {
-//     return res.json(poke)
-//   })
-//   .catch( err => {
-//     console.log(err)
-//   })
-// })
+// update using findOneAndUpdate
+// router.put('/pokemon/:id', findAndUpdatePoke)
 
 // delete
-router.delete('/pokemon/:id', (req, res) => {
-  const { id } = req.params
-  Pokemon.findOneAndDelete({ id })
-  .then( doc => {
-    if(!doc) return res.send(`No pokemon found at id ${id}`)
-      return res.send(`${doc.name} deleted from database`)
-    })
-  .catch( err => res.json(err))
-})
+router.delete('/pokemon/:id', deletePoke)
 
 module.exports = router
